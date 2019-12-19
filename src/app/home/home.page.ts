@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { VisualsService } from '../visuals/services/visuals.service';
-import { SamplerService } from '../sampler/services/sampler.service';
+import { ISamplerService } from '../sampler/services/sampler.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -9,10 +9,10 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['home.page.scss']
 })
 export class HomePage {
-	constructor(private visuals: VisualsService, private sampler: SamplerService) {
+	constructor(private visuals: VisualsService, @Inject('ISamplerService') private sampler: ISamplerService) {
     this.visuals.start();
 
-    let allLoaded = forkJoin(sampler.loaded, visuals.loaded);
+    //let allLoaded = forkJoin(sampler.loaded, visuals.loaded);
   }
 
 	pley() {

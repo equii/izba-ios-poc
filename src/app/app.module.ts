@@ -15,6 +15,11 @@ import { FsWebService } from './fs/services/fsWeb.service';
 import { Platform } from '@ionic/angular';
 import { UtilsService } from './utils/services/utils.service';
 
+import { NativeAudio } from '@ionic-native/native-audio/ngx';
+
+import { SamplerWebService } from './sampler/services/samplerWeb.service';
+import { SamplerNativeService } from './sampler/services/samplerNative.service';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -22,12 +27,25 @@ import { UtilsService } from './utils/services/utils.service';
   providers: [
     StatusBar,
     SplashScreen,
+    NativeAudio,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     {
       provide: 'IFsService',
       useFactory: (platform: Platform, utils: UtilsService) => platform.is('cordova') ? 
         new FsLocalService(utils) : new FsWebService(utils),
-      deps: [Platform, UtilsService]
+        deps: [Platform, UtilsService]
+    },
+    {
+      provide: "ISamplerService",
+      useFactory: (platform: Platform, 
+                  utils: UtilsService, 
+                  nativeAudio: NativeAudio) => {
+                    const fsService = platform.is('cordova') ? new FsLocalService(utils) : new FsWebService(utils);
+                    return platform.is('cordova') ? 
+                      new SamplerNativeService(utils, platform, nativeAudio) : new SamplerWebService(fsService, utils, platform)
+                  }
+        ,
+        deps: [Platform, UtilsService, NativeAudio]
     }
   ],
   bootstrap: [AppComponent]
