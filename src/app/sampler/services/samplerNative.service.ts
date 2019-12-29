@@ -9,9 +9,15 @@ import { ISamplerService } from './sampler.service';
 	providedIn: 'root'
 })
 export class SamplerNativeService implements ISamplerService {
-	@Output() loaded = new EventEmitter();
+	toggle: () => void;
+	play: () => void;
+	stop: () => void;
+
+
+	@Output()loaded: EventEmitter<String>;
 
 	constructor(utilsService: UtilsService, platform: Platform, private nativeAudio: NativeAudio) {
+		this.loaded = new EventEmitter<String>();
 		const config = {
 			p1LoopTime: '35m',
 			p2LoopTime: '35m'

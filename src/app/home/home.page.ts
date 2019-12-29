@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { VisualsService } from '../visuals/services/visuals.service';
 import { ISamplerService } from '../sampler/services/sampler.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 
 @Component({
 	selector: 'app-home',
@@ -10,9 +10,15 @@ import { forkJoin } from 'rxjs';
 })
 export class HomePage {
 	constructor(private visuals: VisualsService, @Inject('ISamplerService') private sampler: ISamplerService) {
-    this.visuals.start();
+		let allLoaded = forkJoin(visuals.loaded, sampler.loaded);
 
-    //let allLoaded = forkJoin(sampler.loaded, visuals.loaded);
+		allLoaded.subscribe(values => {
+			sampler.play();
+		});
+
+		document.querySelector('body').addEventListener('click', function() {
+			sampler.toggle();
+		});
   }
 
 	pley() {

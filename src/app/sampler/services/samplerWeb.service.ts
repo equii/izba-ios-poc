@@ -10,9 +10,20 @@ import { ISamplerService } from './sampler.service';
 	providedIn: 'root'
 })
 export class SamplerWebService implements ISamplerService {
-	@Output() loaded = new EventEmitter();
+	@Output()loaded: EventEmitter<String>;
+	
+	private isPlaying: boolean = false;
+
+	play: () => void;
+	stop: () => void;
+	toggle: () => void;
 
 	constructor(@Inject('IFsService') fsService: IFsService, utilsService: UtilsService, platform: Platform) {
+		this.loaded = new EventEmitter<String>();
+		let _self = this;
+
+		let players = null;
+
 		const config = {
 			p1LoopTime: '35m',
 			p2LoopTime: '35m'
@@ -70,7 +81,6 @@ export class SamplerWebService implements ISamplerService {
 
 		let sampleUrls = neonShimmerSampleNames.map(s => `assets/mp3/${s}.mp3`);
 
-		let players = null;
 		
 		platform.ready().then(onDeviceReady);
 		function onDeviceReady() {
@@ -98,7 +108,8 @@ export class SamplerWebService implements ISamplerService {
 						{}
 					);
 					players = new Tone.Players(toneBuffers).connect(masterFX);
-					play();
+					_self.loaded.emit();
+					_self.loaded.complete();
 				});
 			});
 		}
@@ -146,7 +157,20 @@ export class SamplerWebService implements ISamplerService {
 		reberb.generate();
 		masterFX.chain(gainCompensation, limiter, autopan, reberb, Tone.Master);
 
+		_self.play = play;
+		_self.stop = () => {
+			_self.isPlaying = false;
+			players.stopAll();
+			p1loop.stop();
+		 	p2loop.stop();
+		};
+
+		_self.toggle = () => {
+			
+		};
+
 		function play() {
+			_self.isPlaying = true;
 			console.log('pleey');
 
 			if (Tone.context.state !== 'running') {
@@ -184,15 +208,15 @@ export class SamplerWebService implements ISamplerService {
 			Tone.Transport.start();
 		}
 
-		document.querySelector('body').addEventListener('click', function() {
-			console.log('clicked');
+		// document.querySelector('body').addEventListener('click', function() {
+		// 	console.log('clicked');
 
-			if (Tone.context.state !== 'running') {
-				Tone.context.resume();
-			}
+		// 	if (Tone.context.state !== 'running') {
+		// 		Tone.context.resume();
+		// 	}
 
-			Tone.Transport.start();
-		});
+		// 	Tone.Transport.start();
+		// });
 	}
 
 	start(): void {
