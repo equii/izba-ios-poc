@@ -188,6 +188,7 @@ export class SamplerWebService implements ISamplerService {
 				}
 				player1 = players.get(random1);
 				player1.loop = true;
+				player1.fadeIn = 0.5;
 				player1.start(Tone.now());
 			}, config.p1LoopTime).start(0);
 
@@ -201,6 +202,7 @@ export class SamplerWebService implements ISamplerService {
 					player2ToFade.fadeOut = 0.5;
 				}
 				player2 = players.get(random1);
+				player2.fadeIn = 0.5;
 				player2.start(Tone.now());
 				player2.loop = true;
 			}, config.p2LoopTime).start(0);
